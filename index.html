@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ 5형식 마스터 챌린지 25 ⚡</title>
+    <style>
+        :root {
+            --primary: #6C5CE7;
+            --secondary: #A8A5E6;
+            --success: #2ECC71;
+            --danger: #FF7675;
+            --background: #F6F8FB;
+            --card-bg: #FFFFFF;
+            --text: #2D3436;
+            
+            /* 성분별 색상 가이드 (중학생 직관성용) */
+            --color-s: #FF7675; /* 주어 */
+            --color-v: #74B9FF; /* 동사 */
+            --color-o: #55E6C1; /* 목적어 */
+            --color-c: #F7D794; /* 보어 */
+            --color-m: #D2DAE2; /* 수식어 */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 650px;
+            background: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            padding: 30px;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 헤더 스타일 */
+        header {
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #F1F2F6;
+            padding: 10px 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .score-badge {
+            color: var(--primary);
+        }
+
+        /* 대시보드 / 가이드 */
+        .formula-guide {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .b-s { background-color: var(--color-s); color: #fff; }
+        .b-v { background-color: var(--color-v); color: #fff; }
+        .b-o { background-color: var(--color-o); color: #2D3436; }
+        .b-c { background-color: var(--color-c); color: #2D3436; }
+
+        /* 문제 구역 */
+        .quiz-box {
+            background: #FAFAFA;
+            border: 2px dashed #E0E0E0;
+            border-radius: 16px;
+            padding: 25px 15px;
+            margin-bottom: 25px;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .meaning {
+            font-size: 16px;
+            color: #7F8C8D;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        /* 단어 카드 공간 */
+        .slots-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            min-height: 50px;
+            width: 100%;
+        }
+
+        .word-card {
+            background: var(--card-bg);
+            border: 2px solid #E0E0E0;
+            padding: 10px 18px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            user-select: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+
+        .word-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+            box-shadow: 0 6px 12px rgba(108, 92, 231, 0.15);
+        }
+
+        .word-card.selected {
+            background: #E0DDFE;
+            border-color: var(--primary);
+            color: var(--primary);
+            opacity: 0.6;
+        }
+
+        /* 사용자가 조립 중인 문장창 */
+        .assembly-line {
+            background: #FFF;
+            border: 2px solid #6C5CE7;
+            border-radius: 14px;
+            padding: 15px;
+            min-height: 60px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .assembled-word {
+            background: var(--primary);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            animation: popIn 0.2s ease;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .placeholder-text {
+            color: #BDC3C7;
+            font-size: 14px;
+        }
+
+        /* 제어 버튼들 */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        button {
+            border: none;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-reset {
+            background: #FFF;
+            border: 2px solid #BDC3C7;
+            color: #7F8C8D;
+        }
+        .btn-reset:hover { background: #F1F2F6; }
+
+        .btn-check {
+            background: var(--primary);
+            color: white;
+            flex-grow: 1;
+            max-width: 200px;
+        }
+        .btn-check:hover { background: #5442D5; }
+
+        /* 결과 모달/피드백 피드 */
+        .feedback-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            display: none;
+            text-align: left;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            0% { transform: translateY(10px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        .feedback-box.correct {
+            display: block;
+            background: #E8F5E9;
+            border: 1px solid var(--success);
+            color: #2E7D32;
+        }
+
+        .feedback-box.wrong {
+            display: block;
+            background: #FFEBEE;
+            border: 1px solid var(--danger);
+            color: #C62828;
+        }
+
+        .feedback-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .explanation {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* 구조 가이드 분석 분석 색상 칩 */
+        .analysis-row {
+            margin-top: 8px;
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        /* 종료 화면 */
+        .result-screen {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: white;
+            z-index: 10;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .result-title {
+            font-size: 28px;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .result-score {
+            font-size: 20px;
+            margin-bottom: 30px;
+        }
+
+        .btn-restart {
+            background: var(--success);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- 게임 종료 화면 -->
+    <div class="result-screen" id="resultScreen">
+        <div class="result-title">🎉 5형식 마스터 정복 완료! 🎉</div>
+        <div class="result-score" id="finalScoreDisplay">점수: 0 / 100</div>
+        <button class="btn-restart" onclick="restartGame()">처음부터 다시 도전하기</button>
+    </div>
+
+    <!-- 헤더 영역 -->
+    <header>
+        <h1>⚡ 5형식 문장 조립 챌린지 25 ⚡</h1>
+        <div class="status-bar">
+            <span id="progressIndicator">문제: 1 / 25</span>
+            <span class="score-badge">SCORE: <span id="scoreDisplay">0</span>점</span>
+        </div>
+    </header>
+
+    <!-- 상단 힌트 패널 -->
+    <div class="formula-guide">
+        <span class="badge b-s">주어(S)</span>
+        <span class="badge b-v">동사(V)</span>
+        <span class="badge b-o">목적어(O)</span>
+        <span class="badge b-c">보어(C)</span>
+    </div>
+
+    <!-- 미션 카드 조립대 -->
+    <div class="assembly-line" id="assemblyLine" onclick="handleAssemblyClick(event)">
+        <span class="placeholder-text" id="placeholderText">아래 단어 카드를 순서대로 클릭해서 문장을 완성하세요!</span>
+    </div>
+
+    <!-- 문제 및 보기 -->
+    <div class="quiz-box">
+        <div class="meaning" id="sentenceMeaning">한국어 뜻이 여기에 나타납니다.</div>
+        <div class="slots-container" id="wordsContainer">
+            <!-- 단어 카드가 동적으로 생성됨 -->
+        </div>
+    </div>
+
+    <!-- 제어 및 확인 버튼 -->
+    <div class="btn-group">
+        <button class="btn-reset" onclick="resetCurrentAssembly()">초기화</button>
+        <button class="btn-check" id="actionBtn" onclick="checkAnswer()">정답 확인</button>
+    </div>
+
+    <!-- 정오답 피드백 창 -->
+    <div class="feedback-box" id="feedbackBox">
+        <div class="feedback-title" id="feedbackTitle">결과 메세지</div>
+        <div class="explanation" id="feedbackExplanation">해설 메세지</div>
+        <div class="analysis-row" id="analysisRow"></div>
+    </div>
+</div>
+
+<script>
+    // 1형식부터 5형식까지 각 5문제씩, 총 25문제 데이터 셋
+    const quizData = [
+        // === 1형식 (S + V) ===
+        {
+            type: 1, formula: "S + V", meaning: "[1형식] 그 태양은 밝게 빛난다.",
+            words: ["The sun", "shines", "brightly"], correctOrder: ["The sun", "shines", "brightly"],
+            analysis: [{ word: "The sun", role: "S (주어)", cls: "b-s" }, { word: "shines", role: "V (동사)", cls: "b-v" }, { word: "brightly", role: "M (부사 수식어)", cls: "b-m" }],
+            desc: "1형식(S+V) 문장입니다. 'brightly(밝게)'는 동사를 꾸며주는 부사이므로 핵심 문장 성분(형식)에 포함되지 않아요!"
+        },
+        {
+            type: 1, formula: "S + V", meaning: "[1형식] 많은 새들이 하늘에서 노래한다.",
+            words: ["in the sky", "Many birds", "sing"], correctOrder: ["Many birds", "sing", "in the sky"],
+            analysis: [{ word: "Many birds", role: "S (주어)", cls: "b-s" }, { word: "sing", role: "V (동사)", cls: "b-v" }, { word: "in the sky", role: "M (전치사구 수식어)", cls: "b-m" }],
+            desc: "1형식(S+V) 문장입니다. 'in the sky(하늘에서)'는 장소를 나타내는 수식어(M)구이므로 형식에 영향을 주지 않습니다."
+        },
+        {
+            type: 1, formula: "S + V", meaning: "[1형식] 내 남동생은 침대 위에서 잔다.",
+            words: ["My brother", "on the bed", "sleeps"], correctOrder: ["My brother", "sleeps", "on the bed"],
+            analysis: [{ word: "My brother", role: "S (주어)", cls: "b-s" }, { word: "sleeps", role: "V (동사)", cls: "b-v" }, { word: "on the bed", role: "M (장소 수식어)", cls: "b-m" }],
+            desc: "1형식(S+V) 문장입니다. 장소를 나타내는 전치사구 'on the bed'는 수식어(M)입니다."
+        },
+        {
+            type: 1, formula: "S + V", meaning: "[1형식] 그 기차가 정각에 도착했다.",
+            words: ["arrived", "on time", "The train"], correctOrder: ["The train", "arrived", "on time"],
+            analysis: [{ word: "The train", role: "S (주어)", cls: "b-s" }, { word: "arrived", role: "V (동사)", cls: "b-v" }, { word: "on time", role: "M (시간 수식어)", cls: "b-m" }],
+            desc: "1형식(S+V) 문장입니다. 'on time(정각에)'은 시간을 나타내는 수식어 표현입니다."
+        },
+        {
+            type: 1, formula: "S + V", meaning: "[1형식] 수영장에서는 사고가 일어난다.",
+            words: ["Accidents", "happen", "in the pool"], correctOrder: ["Accidents", "happen", "in the pool"],
+            analysis: [{ word: "Accidents", role: "S (주어)", cls: "b-s" }, { word: "happen", role: "V (동사)", cls: "b-v" }, { word: "in the pool", role: "M (수식어)", cls: "b-m" }],
+            desc: "happen(일어나다, 발생하다)은 대표적인 완전자동사로, 주어와 동사만으로 완벽한 문장을 이루는 1형식 동사입니다."
+        },
+
+        // === 2형식 (S + V + C) ===
+        {
+            type: 2, formula: "S + V + C", meaning: "[2형식] 그 소년은 유명한 의사가 되었다.",
+            words: ["became", "The boy", "a famous doctor"], correctOrder: ["The boy", "became", "a famous doctor"],
+            analysis: [{ word: "The boy", role: "S (주어)", cls: "b-s" }, { word: "became", role: "V (동사)", cls: "b-v" }, { word: "a famous doctor", role: "C (주격보어)", cls: "b-c" }],
+            desc: "2형식(S+V+C) 문장입니다. 'famous doctor'는 주어인 소년의 신분을 보충 설명하는 주격 보어입니다."
+        },
+        {
+            type: 2, formula: "S + V + C", meaning: "[2형식] 이 사과는 매우 새콤한 맛이 난다.",
+            words: ["This apple", "sour", "tastes"], correctOrder: ["This apple", "tastes", "sour"],
+            analysis: [{ word: "This apple", role: "S (주어)", cls: "b-s" }, { word: "tastes", role: "V (감각동사)", cls: "b-v" }, { word: "sour", role: "C (주격보어)", cls: "b-c" }],
+            desc: "2형식 문장입니다. taste, smell, look 등 감각동사 뒤에는 주어의 상태를 설명하는 보어 자리이므로 '부사'가 아닌 '형용사(sour)'가 와야 합니다!"
+        },
+        {
+            type: 2, formula: "S + V + C", meaning: "[2형식] 그녀는 무대 위에서 아름답게 보인다.",
+            words: ["looks", "beautiful", "She", "on the stage"], correctOrder: ["She", "looks", "beautiful", "on the stage"],
+            analysis: [{ word: "She", role: "S (주어)", cls: "b-s" }, { word: "looks", role: "V (감각동사)", cls: "b-v" }, { word: "beautiful", role: "C (주격보어)", cls: "b-c" }, { word: "on the stage", role: "M (수식어)", cls: "b-m" }],
+            desc: "2형식 문장입니다. 우리말로는 '아름답게(부사처럼)' 해석되더라도, 영어 보어 자리에는 반드시 형용사(beautiful)를 써야 합니다."
+        },
+        {
+            type: 2, formula: "S + V + C", meaning: "[2형식] 그 질문은 쉬운 것처럼 들린다.",
+            words: ["The question", "sounds", "easy"], correctOrder: ["The question", "sounds", "easy"],
+            analysis: [{ word: "The question", role: "S (주어)", cls: "b-s" }, { word: "sounds", role: "V (감각동사)", cls: "b-v" }, { word: "easy", role: "C (주격보어)", cls: "b-c" }],
+            desc: "2형식 문장입니다. 감각동사 sound 뒤에 주격보어로 형용사 easy가 사용되었습니다."
+        },
+        {
+            type: 2, formula: "S + V + C", meaning: "[2형식] 날씨가 서서히 추워지고 있다.",
+            words: ["The weather", "is getting", "cold"], correctOrder: ["The weather", "is getting", "cold"],
+            analysis: [{ word: "The weather", role: "S (주어)", cls: "b-s" }, { word: "is getting", role: "V (동사)", cls: "b-v" }, { word: "cold", role: "C (주격보어)", cls: "b-c" }],
+            desc: "get + 형용사는 '~한 상태가 되다'라는 뜻으로 상태의 변화를 나타내는 대표적인 2형식 구조입니다."
+        },
+
+        // === 3형식 (S + V + O) ===
+        {
+            type: 3, formula: "S + V + O", meaning: "[3형식] 모든 학생들은 그 영웅을 존경한다.",
+            words: ["respects", "All students", "the hero"], correctOrder: ["All students", "respects", "the hero"],
+            analysis: [{ word: "All students", role: "S (주어)", cls: "b-s" }, { word: "respects", role: "V (동사)", cls: "b-v" }, { word: "the hero", role: "O (목적어)", cls: "b-o" }],
+            desc: "3형식(S+V+O) 문장입니다. '~을/를'에 해당하는 대상을 직접 필요로 하므로 'the hero'가 목적어입니다."
+        },
+        {
+            type: 3, formula: "S + V + O", meaning: "[3형식] 제인은 어제 새 책을 샀다.",
+            words: ["bought", "a new book", "Jane", "yesterday"], correctOrder: ["Jane", "bought", "a new book", "yesterday"],
+            analysis: [{ word: "Jane", role: "S (주어)", cls: "b-s" }, { word: "bought", role: "V (동사)", cls: "b-v" }, { word: "a new book", role: "O (목적어)", cls: "b-o" }, { word: "yesterday", role: "M (수식어)", cls: "b-m" }],
+            desc: "3형식 문장입니다. '새 책을'에 해당하는 명사구가 목적어(O)이며, yesterday는 시간 부사 수식어(M)입니다."
+        },
+        {
+            type: 3, formula: "S + V + O", meaning: "[3형식] 우리는 내일 축구를 할 것이다.",
+            words: ["will play", "soccer", "We", "tomorrow"], correctOrder: ["We", "will play", "soccer", "tomorrow"],
+            analysis: [{ word: "We", role: "S (주어)", cls: "b-s" }, { word: "will play", role: "V (동사)", cls: "b-v" }, { word: "soccer", role: "O (목적어)", cls: "b-o" }, { word: "tomorrow", role: "M (수식어)", cls: "b-m" }],
+            desc: "3형식 문장입니다. soccer(축구를)가 목적어입니다."
+        },
+        {
+            type: 3, formula: "S + V + O", meaning: "[3형식] Tom은 매일 그의 고양이를 씻긴다.",
+            words: ["washes", "his cat", "Tom", "every day"], correctOrder: ["Tom", "washes", "his cat", "every day"],
+            analysis: [{ word: "Tom", role: "S (주어)", cls: "b-s" }, { word: "washes", role: "V (동사)", cls: "b-v" }, { word: "his cat", role: "O (목적어)", cls: "b-o" }, { word: "every day", role: "M (수식어)", cls: "b-m" }],
+            desc: "3형식 문장입니다. his cat이 동사 wash의 목적어 대상입니다."
+        },
+        {
+            type: 3, formula: "S + V + O", meaning: "[3형식] 나는 피아노 치는 것을 원한다.",
+            words: ["to play the piano", "I", "want"], correctOrder: ["I", "want", "to play the piano"],
+            analysis: [{ word: "I", role: "S (주어)", cls: "b-s" }, { word: "want", role: "V (동사)", cls: "b-v" }, { word: "to play the piano", role: "O (목적어-to부정사구)", cls: "b-o" }],
+            desc: "3형식 문장입니다. want 동사는 to부정사구를 목적어(~하는 것을)로 취하는 특징이 있습니다."
+        },
+
+        // === 4형식 (S + V + IO + DO) ===
+        {
+            type: 4, formula: "S + V + IO + DO", meaning: "[4형식] 아버지는 나에게 멋진 자전거를 사주셨다.",
+            words: ["me", "My father", "a nice bike", "bought"], correctOrder: ["My father", "bought", "me", "a nice bike"],
+            analysis: [{ word: "My father", role: "S (주어)", cls: "b-s" }, { word: "bought", role: "V (동사)", cls: "b-v" }, { word: "me", role: "IO (간접목적어)", cls: "b-o" }, { word: "a nice bike", role: "DO (직접목적어)", cls: "b-o" }],
+            desc: "4형식(S+V+IO+DO) 문장입니다. 수여동사(bought) 뒤에 간접목적어(~에게)와 직접목적어(~을/를)가 순서대로 옵니다."
+        },
+        {
+            type: 4, formula: "S + V + IO + DO", meaning: "[4형식] 선생님은 우리에게 흥미로운 이야기를 말해주셨다.",
+            words: ["told", "us", "The teacher", "an interesting story"], correctOrder: ["The teacher", "told", "us", "an interesting story"],
+            analysis: [{ word: "The teacher", role: "S (주어)", cls: "b-s" }, { word: "told", role: "V (동사)", cls: "b-v" }, { word: "us", role: "IO (간접목적어)", cls: "b-o" }, { word: "an interesting story", role: "DO (직접목적어)", cls: "b-o" }],
+            desc: "4형식 문장입니다. us(~에게)가 간접목적어, an interesting story(~을)가 직접목적어입니다."
+        },
+        {
+            type: 4, formula: "S + V + IO + DO", meaning: "[4형식] 그녀는 나에게 영어와 수학을 가르쳐준다.",
+            words: ["teaches", "me", "English and math", "She"], correctOrder: ["She", "teaches", "me", "English and math"],
+            analysis: [{ word: "She", role: "S (주어)", cls: "b-s" }, { word: "teaches", role: "V (동사)", cls: "b-v" }, { word: "me", role: "IO (간접목적어)", cls: "b-o" }, { word: "English and math", role: "DO (직접목적어)", cls: "b-o" }],
+            desc: "4형식 문장입니다. 'me'에게 'English and math'를 가르쳐 주는 수여 구조입니다."
+        },
+        {
+            type: 4, formula: "S + V + IO + DO", meaning: "[4형식] 그는 그의 여자친구에게 편지를 보냈다.",
+            words: ["sent", "his girlfriend", "He", "a letter"], correctOrder: ["He", "sent", "his girlfriend", "a letter"],
+            analysis: [{ word: "He", role: "S (주어)", cls: "b-s" }, { word: "sent", role: "V (동사)", cls: "b-v" }, { word: "his girlfriend", role: "IO (간접목적어)", cls: "b-o" }, { word: "a letter", role: "DO (직접목적어)", cls: "b-o" }],
+            desc: "4형식 문장입니다. 보낸 대상(~에게)인 his girlfriend가 먼저 오고 사물(~을)인 a letter가 뒤에 옵니다."
+        },
+        {
+            type: 4, formula: "S + V + IO + DO", meaning: "[4형식] 할머니께서 나에게 맛있는 쿠키를 만들어 주셨다.",
+            words: ["Grandma", "made", "me", "delicious cookies"], correctOrder: ["Grandma", "made", "me", "delicious cookies"],
+            analysis: [{ word: "Grandma", role: "S (주어)", cls: "b-s" }, { word: "made", role: "V (동사)", cls: "b-v" }, { word: "me", role: "IO (간접목적어)", cls: "b-o" }, { word: "delicious cookies", role: "DO (직접목적어)", cls: "b-o" }],
+            desc: "4형식 문장입니다. make가 수여동사로 쓰여 '~에게 ~을 만들어주다'라는 의미를 완성합니다."
+        },
+
+        // === 5형식 (S + V + O + C) ===
+        {
+            type: 5, formula: "S + V + O + C", meaning: "[5형식] 그 뉴스는 그를 행복하게 만들었다.",
+            words: ["happy", "The news", "made", "him"], correctOrder: ["The news", "made", "him", "happy"],
+            analysis: [{ word: "The news", role: "S (주어)", cls: "b-s" }, { word: "made", role: "V (동사)", cls: "b-v" }, { word: "him", role: "O (목적어)", cls: "b-o" }, { word: "happy", role: "OC (목적격보어)", cls: "b-c" }],
+            desc: "★핵심 5형식 문장! 행복한 상태인 것은 그(him)이므로, 목적어의 상태를 꾸미는 보어 자리에는 부사가 아닌 '형용사(happy)'가 와야 합니다!"
+        },
+        {
+            type: 5, formula: "S + V + O + C", meaning: "[5형식] 우리는 우리 고양이를 '쿠키'라고 부른다.",
+            words: ["We", "call", "our cat", "Cookie"], correctOrder: ["We", "call", "our cat", "Cookie"],
+            analysis: [{ word: "We", role: "S (주어)", cls: "b-s" }, { word: "call", role: "V (동사)", cls: "b-v" }, { word: "our cat", role: "O (목적어)", cls: "b-o" }, { word: "Cookie", role: "OC (목적격보어)", cls: "b-c" }],
+            desc: "5형식 문장입니다. 목적어(our cat)와 목적격 보어(Cookie)는 서로 '동등한 존재'를 나타내는 명사 보어 관계입니다."
+        },
+        {
+            type: 5, formula: "S + V + O + C", meaning: "[5형식] 엄마는 나에게 내 방을 청소하라고 하셨다.",
+            words: ["My mom", "told", "me", "to clean my room"], correctOrder: ["My mom", "told", "me", "to clean my room"],
+            analysis: [{ word: "My mom", role: "S (주어)", cls: "b-s" }, { word: "told", role: "V (동사)", cls: "b-v" }, { word: "me", role: "O (목적어)", cls: "b-o" }, { word: "to clean my room", role: "OC (목적격보어)", cls: "b-c" }],
+            desc: "5형식 문장입니다. tell 동사는 목적어가 미래에 할 행동을 지시하므로 목적격 보어 자리에 'to부정사구'를 필수로 사용합니다."
+        },
+        {
+            type: 5, formula: "S + V + O + C", meaning: "[5형식] 나는 내 컴퓨터가 망가진 것을 알게 되었다.",
+            words: ["I", "found", "my computer", "broken"], correctOrder: ["I", "found", "my computer", "broken"],
+            analysis: [{ word: "I", role: "S (주어)", cls: "b-s" }, { word: "found", role: "V (동사)", cls: "b-v" }, { word: "my computer", role: "O (목적어)", cls: "b-o" }, { word: "broken", role: "OC (목적격보어)", cls: "b-c" }],
+            desc: "5형식 문장입니다. 내 컴퓨터(목적어)가 파손을 '당한(수동)' 상태이므로 목적격 보어 자리에 과거분사(broken)가 왔습니다."
+        },
+        {
+            type: 5, formula: "S + V + O + C", meaning: "[5형식] 책을 읽는 것은 나를 똑똑하게 만들어 준다.",
+            words: ["Reading books", "makes", "me", "smart"], correctOrder: ["Reading books", "makes", "me", "smart"],
+            analysis: [{ word: "Reading books", role: "S (주어)", cls: "b-s" }, { word: "makes", role: "V (동사)", cls: "b-v" }, { word: "me", role: "O (목적어)", cls: "b-o" }, { word: "smart", role: "OC (목적격보어)", cls: "b-c" }],
+            desc: "5형식 문장입니다. 똑똑해지는 것은 목적어인 나(me)이므로 형용사 보어 smart가 목적격을 보충하고 있습니다."
+        }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let userAssembly = [];
+    let isAnswerChecked = false;
+
+    // 요소 로드
+    const progressIndicator = document.getElementById("progressIndicator");
+    const scoreDisplay = document.getElementById("scoreDisplay");
+    const sentenceMeaning = document.getElementById("sentenceMeaning");
+    const wordsContainer = document.getElementById("wordsContainer");
+    const assemblyLine = document.getElementById("assemblyLine");
+    const placeholderText = document.getElementById("placeholderText");
+    const actionBtn = document.getElementById("actionBtn");
+    const feedbackBox = document.getElementById("feedbackBox");
+    const feedbackTitle = document.getElementById("feedbackTitle");
+    const feedbackExplanation = document.getElementById("feedbackExplanation");
+    const analysisRow = document.getElementById("analysisRow");
+    const resultScreen = document.getElementById("resultScreen");
+    const finalScoreDisplay = document.getElementById("finalScoreDisplay");
+
+    function loadQuestion() {
+        isAnswerChecked = false;
+        userAssembly = [];
+        actionBtn.innerText = "정답 확인";
+        actionBtn.className = "btn-check";
+        feedbackBox.className = "feedback-box";
+        feedbackBox.style.display = "none";
+        
+        const currentQuiz = quizData[currentIdx];
+        
+        progressIndicator.innerText = `문제: ${currentIdx + 1} / ${quizData.length}`;
+        sentenceMeaning.innerText = currentQuiz.meaning;
+        
+        renderAssembly();
+
+        wordsContainer.innerHTML = "";
+        let shuffledWords = [...currentQuiz.words];
+        shuffledWords.sort(() => Math.random() - 0.5);
+
+        shuffledWords.forEach((word) => {
+            const card = document.createElement("div");
+            card.className = "word-card";
+            card.innerText = word;
+            card.onclick = () => handleWordSelect(word, card);
+            wordsContainer.appendChild(card);
+        });
+    }
+
+    function handleWordSelect(word, cardElement) {
+        if(isAnswerChecked) return;
+        
+        if (cardElement.classList.contains("selected")) {
+            cardElement.classList.remove("selected");
+            userAssembly = userAssembly.filter(w => w !== word);
+        } else {
+            cardElement.classList.add("selected");
+            userAssembly.push(word);
+        }
+        renderAssembly();
+    }
+
+    function renderAssembly() {
+        const assembledElements = assemblyLine.querySelectorAll(".assembled-word");
+        assembledElements.forEach(el => el.remove());
+
+        if (userAssembly.length === 0) {
+            placeholderText.style.display = "inline";
+        } else {
+            placeholderText.style.display = "none";
+            userAssembly.forEach((word) => {
+                const span = document.createElement("span");
+                span.className = "assembled-word";
+                span.innerText = word;
+                assemblyLine.appendChild(span);
+            });
+        }
+    }
+
+    function handleAssemblyClick(event) {
+        if (isAnswerChecked) return;
+        if (event.target.classList.contains("assembled-word")) {
+            const removedText = event.target.innerText;
+            userAssembly = userAssembly.filter(w => w !== removedText);
+            
+            const cards = wordsContainer.querySelectorAll(".word-card");
+            cards.forEach(card => {
+                if(card.innerText === removedText) {
+                    card.classList.remove("selected");
+                }
+            });
+            renderAssembly();
+        }
+    }
+
+    function resetCurrentAssembly() {
+        if(isAnswerChecked) return;
+        userAssembly = [];
+        renderAssembly();
+        const cards = wordsContainer.querySelectorAll(".word-card");
+        cards.forEach(card => card.classList.remove("selected"));
+    }
+
+    function checkAnswer() {
+        if (userAssembly.length === 0) {
+            alert("단어 카드를 클릭하여 문장을 먼저 완성해 주세요!");
+            return;
+        }
+
+        const currentQuiz = quizData[currentIdx];
+
+        if (isAnswerChecked) {
+            currentIdx++;
+            if (currentIdx < quizData.length) {
+                loadQuestion();
+            } else {
+                showFinalResult();
+            }
+            return;
+        }
+
+        const isCorrect = JSON.stringify(userAssembly) === JSON.stringify(currentQuiz.correctOrder);
+        isAnswerChecked = true;
+
+        analysisRow.innerHTML = "";
+        
+        if (isCorrect) {
+            // 총 25문제이므로 문제당 4점씩 부여하여 100점 만점 설계
+            score += 4;
+            scoreDisplay.innerText = score;
+            feedbackBox.className = "feedback-box correct";
+            feedbackTitle.innerHTML = "🎯 정답입니다! 아주 잘했어요!";
+        } else {
+            feedbackBox.className = "feedback-box wrong";
+            feedbackTitle.innerHTML = "😢 오답입니다! 올바른 형식을 복습해 봅시다.";
+        }
+
+        currentQuiz.analysis.forEach(item => {
+            const chip = document.createElement("span");
+            chip.className = `badge ${item.cls || 'b-m'}`;
+            chip.style.marginRight = "5px";
+            chip.style.padding = "4px 8px";
+            chip.innerText = `${item.word} [${item.role}]`;
+            analysisRow.appendChild(chip);
+        });
+
+        feedbackExplanation.innerText = currentQuiz.desc;
+        
+        actionBtn.innerText = currentIdx === quizData.length - 1 ? "최종 결과 보기" : "다음 문제 풀기 ➡️";
+        actionBtn.className = "btn-check";
+    }
+
+    function showFinalResult() {
+        resultScreen.style.display = "flex";
+        finalScoreDisplay.innerText = `나의 최종 점수: ${score}점 / 100점`;
+    }
+
+    function restartGame() {
+        currentIdx = 0;
+        score = 0;
+        scoreDisplay.innerText = "0";
+        resultScreen.style.display = "none";
+        loadQuestion();
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>
